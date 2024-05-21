@@ -7,16 +7,18 @@ class UpdateProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final controller = Get.put(ProfileController());
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            } /*=> Get.back()*/,
-            icon: const Icon(LineAwesomeIcons.angle_left)),
-        title: Text(tEditProfile,
-            style: Theme.of(context).textTheme.headlineMedium),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(LineAwesomeIcons.angle_left),
+        ),
+        title: Text(
+          tEditProfile,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -30,8 +32,9 @@ class UpdateProfileScreen extends StatelessWidget {
                     width: 120,
                     height: 120,
                     child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: const Image(image: AssetImage('tProfileImage'))),
+                      borderRadius: BorderRadius.circular(100),
+                      child: const Image(image: AssetImage('tProfileImage')),
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -40,10 +43,14 @@ class UpdateProfileScreen extends StatelessWidget {
                       width: 35,
                       height: 35,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: Colors.white),
-                      child: const Icon(LineAwesomeIcons.camera,
-                          color: Colors.black, size: 20),
+                        borderRadius: BorderRadius.circular(100),
+                        color: Colors.white,
+                      ),
+                      child: const Icon(
+                        LineAwesomeIcons.camera,
+                        color: Colors.black,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
@@ -54,32 +61,43 @@ class UpdateProfileScreen extends StatelessWidget {
               Form(
                 child: Column(
                   children: [
+                    // Username field
                     TextFormField(
                       decoration: const InputDecoration(
-                          label: Text(tUserName),
-                          prefixIcon: Icon(LineAwesomeIcons.user)),
+                        labelText: tUserName,
+                        prefixIcon: Icon(LineAwesomeIcons.user),
+                      ),
                     ),
                     const SizedBox(height: tFormHeight - 20),
+
+                    // Email field
                     TextFormField(
                       decoration: const InputDecoration(
-                          label: Text(tEmail),
-                          prefixIcon: Icon(LineAwesomeIcons.envelope_1)),
+                        labelText: tEmail,
+                        prefixIcon: Icon(LineAwesomeIcons.envelope_1),
+                      ),
                     ),
                     const SizedBox(height: tFormHeight - 20),
+
+                    // Phone number field
                     TextFormField(
                       decoration: const InputDecoration(
-                          label: Text(tPhoneNo),
-                          prefixIcon: Icon(LineAwesomeIcons.phone)),
+                        labelText: tPhoneNo,
+                        prefixIcon: Icon(LineAwesomeIcons.phone),
+                      ),
                     ),
                     const SizedBox(height: tFormHeight - 20),
+
+                    // Password field
                     TextFormField(
                       obscureText: true,
                       decoration: InputDecoration(
-                        label: const Text(tPassword),
+                        labelText: tPassword,
                         prefixIcon: const Icon(Icons.fingerprint),
                         suffixIcon: IconButton(
-                            icon: const Icon(LineAwesomeIcons.eye_slash),
-                            onPressed: () {}),
+                          icon: const Icon(LineAwesomeIcons.eye_slash),
+                          onPressed: () {},
+                        ),
                       ),
                     ),
                     const SizedBox(height: tFormHeight),
@@ -88,17 +106,20 @@ class UpdateProfileScreen extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    //login button
+
+                    // Edit Profile button
                     GestureDetector(
                       onTap: () {},
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(colors: [
-                            Color.fromRGBO(143, 148, 251, 1),
-                            Color.fromRGBO(143, 148, 251, .6),
-                          ]),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color.fromRGBO(143, 148, 251, 1),
+                              Color.fromRGBO(143, 148, 251, .6),
+                            ],
+                          ),
                         ),
                         child: const Center(
                           child: Text(
@@ -111,6 +132,7 @@ class UpdateProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: tFormHeight),
 
                     // -- Created Date and Delete Button

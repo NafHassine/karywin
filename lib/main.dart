@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:kary_win/screens/auth/new_login.dart';
+import 'package:kary_win/screens/auth/login.dart';
+import 'package:kary_win/screens/super_user_home.dart';
 // Import the generated file
 import 'firebase_options.dart';
 // import 'package:firebase_app_check/firebase_app_check.dart';

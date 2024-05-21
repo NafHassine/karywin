@@ -1,7 +1,7 @@
 import 'package:kary_win/data/data.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:kary_win/screens/auth/new_signup.dart';
+import 'package:kary_win/screens/auth/signup.dart';
 import 'package:kary_win/screens/profile/profile.dart';
 import '../screens/home.dart';
 

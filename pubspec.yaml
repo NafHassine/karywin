@@ -46,7 +46,7 @@ dependencies:
   url_launcher: ^6.2.6
   http: ^1.2.1
   interactive_viewer_2: ^0.0.8
-  syncfusion_flutter_maps: ^25.1.41
+  syncfusion_flutter_maps: ^25.2.4
   ionicons: ^0.2.2
   line_awesome_flutter: ^2.0.0
   image_picker: ^1.1.0

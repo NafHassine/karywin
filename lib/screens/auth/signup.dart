@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:kary_win/screens/auth/new_login.dart';
+import 'package:kary_win/screens/auth/login.dart';
 
 class NewSignupPage extends StatelessWidget {
   const NewSignupPage({super.key});
@@ -39,6 +39,7 @@ class NewSignupPage extends StatelessWidget {
           'username': usernameController.text,
           'email': emailController.text,
           'phone': phoneController.text,
+          'Role': 'User'
           // Add more fields if needed
         });
 

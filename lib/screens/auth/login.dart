@@ -2,7 +2,8 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kary_win/routing/routing.dart';
-import 'package:kary_win/screens/auth/new_signup.dart';
+import 'package:kary_win/screens/auth/auth_handler.dart';
+import 'package:kary_win/screens/auth/signup.dart';
 import 'package:kary_win/screens/auth/reset_password.dart';
 
 class NewLoginPage extends StatelessWidget {
@@ -124,16 +125,9 @@ class NewLoginPage extends StatelessWidget {
                           await FirebaseAppCheck.instance.activate(
                               androidProvider: AndroidProvider.playIntegrity);
                           // await _auth.signOut();
-                          await _auth.signInWithEmailAndPassword(
-                            email: 'hamza@gmail.com',
-                            password: '123456',
-                          );
-                          // If login is successful, navigate to the Register screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Routing()),
-                          );
+                          String email = emailController.text;
+                          String password = passwordController.text;
+                          handleLogin(context, email, password);
                         } catch (e) {
                           // Handle login errors here
                           print("Error: $e");
