@@ -9,16 +9,14 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:kary_win/screens/profile/profile_menu.dart';
 import 'package:kary_win/screens/profile/updateprofilescreen.dart';
 
-class ProfileScreen extends StatefulWidget {
-  final VoidCallback onLogout;
-
-  const ProfileScreen({super.key, required this.onLogout});
+class Profile extends StatefulWidget {
+  const Profile({super.key});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<Profile> {
   late User? _currentUser;
   Map<String, dynamic>? _userData;
   File? _image;
@@ -31,10 +29,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _getUserData();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _getUserData();
+  }
+
   void logout() async {
     try {
       await FirebaseAuth.instance.signOut();
-      widget.onLogout();
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => NewLoginPage()));
     } catch (e) {
@@ -50,20 +53,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .doc(_currentUser!.uid)
             .get();
 
-        _userData = userSnapshot.data() as Map<String, dynamic>?;
-
-        // Check if user has an image URL
+        setState(() {
+          _userData = userSnapshot.data() as Map<String, dynamic>?;
+        });
         if (_userData != null && _userData!.containsKey('imageUrl')) {
           String userId = _currentUser!.uid;
           String imagePath = 'profile_images/$userId/profile.png';
 
-          // Load image from Firebase Storage
+          // Load image from Firebase Storage using the constructed path
           firebase_storage.Reference ref =
               firebase_storage.FirebaseStorage.instance.ref(imagePath);
           String downloadURL = await ref.getDownloadURL();
-          _image = File(downloadURL);
+          setState(() {
+            _image = File(downloadURL);
+          });
         }
-
         setState(() {
           _isLoading = false;
         });
@@ -88,12 +92,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       String userId = _currentUser!.uid;
 
-      // Upload image to Firebase Storage
+      // Upload image to Firebase Storage under a folder with user's ID
       firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
           .ref()
           .child('profile_images')
           .child(userId)
           .child('profile.jpg');
+
       try {
         await ref.putFile(_image!);
       } catch (e) {
@@ -104,6 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
       String downloadURL = await ref.getDownloadURL();
+
       // Update user document with the image URL
       final userRef =
           FirebaseFirestore.instance.collection('users').doc(userId);
@@ -113,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }, SetOptions(merge: true));
         setState(() {
           _isLoading = false;
-        });
+        }); // Merge the new field with existing data
       } catch (e) {
         print('Error updating user document: $e');
         setState(() {

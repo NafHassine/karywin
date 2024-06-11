@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/data.dart';
-import '../../Models/model.dart';
+import '../../../data/data.dart';
+import '../../../Models/model.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -119,7 +119,6 @@ class _HomeState extends State<Home> {
           color: kSecondaryColor.withOpacity(0.1),
         ),
         child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Icon(
               FontAwesomeIcons.magnifyingGlass,
@@ -147,7 +146,6 @@ class _HomeState extends State<Home> {
 
   Widget categories() {
     return const Column(
-      // mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
@@ -183,7 +181,6 @@ class _HomeState extends State<Home> {
 
   Widget modelCategories() {
     return SizedBox(
-      // color: Colors.red,
       width: double.infinity,
       height: 200,
       child: Column(
@@ -212,8 +209,6 @@ class _HomeState extends State<Home> {
                   ...List.generate(
                       data_2.length,
                       (i) => Container(
-                            // width: 80,
-                            // color: Colors.green,
                             margin: const EdgeInsets.only(left: 35),
                             child: Column(
                               children: [

@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ResetPassword extends StatefulWidget {
-  const ResetPassword({Key? key}) : super(key: key);
+  const ResetPassword({super.key});
 
   @override
   _ResetPasswordState createState() => _ResetPasswordState();
@@ -77,7 +77,6 @@ class _ResetPasswordState extends State<ResetPassword> {
                                   border: InputBorder.none,
                                   hintText: "Email",
                                   hintStyle: TextStyle(color: Colors.grey[400]),
-                                  //prefixIcon: Icon(Icons.mail),
                                 ),
                               ),
                             ),

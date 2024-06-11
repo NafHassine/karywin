@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kary_win/routing/routing.dart';
-import 'package:kary_win/screens/super_user_home.dart';
-import 'package:kary_win/screens/test.dart';
+import 'package:kary_win/screens/driver_interface/super_user_home.dart';
 
 Future<User?> login(String email, String password) async {
   try {
@@ -24,8 +23,7 @@ Future<String?> fetchUserType(String uid) async {
     DocumentSnapshot userDoc =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (userDoc.exists) {
-      return userDoc[
-          'Role']; // Assuming 'userType' is a field in your Firestore document
+      return userDoc['Role'];
     } else {
       throw Exception('No such user!');
     }
@@ -36,16 +34,18 @@ Future<String?> fetchUserType(String uid) async {
 }
 
 void redirectToInterface(BuildContext context, String userType) {
+  var _isloading = true;
   if (userType == 'SuperUser') {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => DriverRouteScreen()),
-    ); // Adjust the route name to your superuser interface
-  } else {
-    Navigator.push(
+      MaterialPageRoute(builder: (context) => const DriverRouteScreen()),
+    ); 
+  }
+  if (userType == 'User') {
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const Routing()),
-    ); // Adjust the route name to your user interface
+    ); 
   }
 }
 
@@ -62,4 +62,13 @@ Future<void> handleLogin(
   } else {
     print('Login failed');
   }
+}
+
+String? validateEmail(String? email) {
+  RegExp emailRegex = RegExp(r'^[\w\.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
+  final isEmailValid = emailRegex.hasMatch(email ?? '');
+  if (!isEmailValid) {
+    return 'Enter a Valid Email';
+  }
+  return null;
 }

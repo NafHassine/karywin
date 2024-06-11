@@ -3,80 +3,81 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kary_win/screens/auth/login.dart';
 
-class NewSignupPage extends StatelessWidget {
+class NewSignupPage extends StatefulWidget {
   const NewSignupPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController phoneController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController confirmPasswordController = TextEditingController();
+  _NewSignupPageState createState() => _NewSignupPageState();
+}
 
-    Future<void> register(BuildContext context) async {
-      try {
-        if (passwordController.text != confirmPasswordController.text) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Passwords do not match'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-          return;
-        }
+class _NewSignupPageState extends State<NewSignupPage> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
-        // Register user with email and password
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-                email: emailController.text, password: passwordController.text);
-
-        // Store additional user information in Firestore
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user?.uid)
-            .set({
-          'username': usernameController.text,
-          'email': emailController.text,
-          'phone': phoneController.text,
-          'Role': 'User'
-          // Add more fields if needed
-        });
-
-        // Show registration success dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Registration Successful"),
-              content: const Text("You have successfully registered."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => NewLoginPage()));
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
-      } catch (e) {
-        // Handle registration errors
-        print('Error registering user: $e');
+  Future<void> register(BuildContext context) async {
+    try {
+      if (passwordController.text != confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error registering user: $e'),
-            duration: const Duration(seconds: 3),
+          const SnackBar(
+            content: Text('Passwords do not match'),
+            duration: Duration(seconds: 3),
           ),
         );
+        return;
       }
+      // Register user with email and password
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text);
+      // Store additional user information in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user?.uid)
+          .set({
+        'username': usernameController.text,
+        'email': emailController.text,
+        'phone': phoneController.text,
+        'Role': 'User'
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Registration Successful"),
+            content: const Text("You have successfully registered."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => NewLoginPage()));
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      // Handle registration errors
+      print('Error registering user: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error registering user: $e'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
@@ -182,22 +183,50 @@ class NewSignupPage extends StatelessWidget {
                                               255, 231, 231, 231)))),
                               child: TextField(
                                 controller: passwordController,
+                                obscureText: !_isPasswordVisible,
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Password",
                                     hintStyle:
-                                        TextStyle(color: Colors.grey[400])),
+                                        TextStyle(color: Colors.grey[400]),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isPasswordVisible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isPasswordVisible =
+                                              !_isPasswordVisible;
+                                        });
+                                      },
+                                    )),
                               ),
                             ),
                             Container(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
                                 controller: confirmPasswordController,
+                                obscureText: !_isConfirmPasswordVisible,
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Confirm Password",
                                     hintStyle:
-                                        TextStyle(color: Colors.grey[400])),
+                                        TextStyle(color: Colors.grey[400]),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isConfirmPasswordVisible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isConfirmPasswordVisible =
+                                              !_isConfirmPasswordVisible;
+                                        });
+                                      },
+                                    )),
                               ),
                             ),
                           ],
@@ -218,7 +247,6 @@ class NewSignupPage extends StatelessWidget {
                         child: GestureDetector(
                           onTap: () {
                             register(context);
-                            // Add your onTap functionality here
                             print("Container tapped!");
                           },
                           child: const Center(
@@ -237,7 +265,6 @@ class NewSignupPage extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Navigate to the registration screen
                           Navigator.pop(context);
                         },
                         child: const Text(

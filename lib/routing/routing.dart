@@ -1,9 +1,9 @@
 import 'package:kary_win/data/data.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:kary_win/screens/auth/signup.dart';
+import 'package:kary_win/screens/user_interface/location.dart';
 import 'package:kary_win/screens/profile/profile.dart';
-import '../screens/home.dart';
+import '../screens/user_interface/home.dart';
 
 class Routing extends StatefulWidget {
   const Routing({super.key});
@@ -13,12 +13,17 @@ class Routing extends StatefulWidget {
 }
 
 class _RoutingState extends State<Routing> {
-  List routing = [
-    const Home(),
-    {},
-    const NewSignupPage(),
-    const ProfileScreen(),
-  ];
+  void _resetIndex() {
+    setState(() {
+      currentIndex = 0;
+    });
+  }
+
+  List<Widget> get routing => [
+        const Home(),
+        const Location(),
+        ProfileScreen(onLogout: _resetIndex),
+      ];
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
@@ -27,15 +32,11 @@ class _RoutingState extends State<Routing> {
       alignment: Alignment.bottomCenter,
       children: [
         routing.elementAt(currentIndex),
-        //condition bech matodhhorch el nav bar fi screens mou3aynin
-        //if (currentIndex != 0)
-        //--------------------------------
         Container(
           margin: EdgeInsets.all(displayWidth * .05),
           height: displayWidth * .155,
           alignment: Alignment.center,
           decoration: const BoxDecoration(
-              //colour mta3 nav bar
               gradient: LinearGradient(colors: [
                 Color.fromRGBO(143, 148, 251, 1),
                 Color.fromRGBO(143, 148, 251, .6),

@@ -4,10 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:kary_win/screens/user_map.dart';
-import 'package:syncfusion_flutter_maps/maps.dart';
+import 'package:kary_win/screens/user_interface/methods.dart';
+import 'package:kary_win/screens/user_interface/user_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../data/data.dart';
+import '../../../data/data.dart';
 
 class Details extends StatefulWidget {
   final int index;
@@ -28,6 +30,7 @@ class DdetailsState extends State<Details> {
   ScrollPhysics _physics = const ClampingScrollPhysics();
   bool appBarVAR = false;
   bool bottomBarImagesVAR = false;
+  Map<String, double>? _fetchedLocationData;
 
   @override
   void initState() {
@@ -37,6 +40,7 @@ class DdetailsState extends State<Details> {
 
   void _initState() {
     _fetchData();
+    _fetchedLocationData;
     _runAnimation();
     _controller.addListener(() {
       if (_controller.position.pixels <= 100) {
@@ -45,6 +49,16 @@ class DdetailsState extends State<Details> {
         setState(() => _physics = const BouncingScrollPhysics());
       }
     });
+  }
+
+  void _launchMapsUrl(String place) async {
+    final String googleMapsUrl =
+        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(place)}&travelmode=driving&dir_action=navigate";
+    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } else {
+      throw 'Could not launch $googleMapsUrl';
+    }
   }
 
   Future<void> _fetchData() async {
@@ -71,12 +85,10 @@ class DdetailsState extends State<Details> {
     // Find the selected station in the selected route
     var selectedStation = await selectedRoute['busStations'].firstWhere(
       (element) => element['name'] == _selectedSubcollection,
-      // Handle the case where no station is found
     );
     print(selectedStation['name']);
 
     if (selectedStation != null) {
-      // Extract LatLng points from the circuit of the selected station
       var circuit = selectedStation['circuit'] as List<dynamic>;
       _formattedPoints = circuit.map((circuitPoint) {
         double lat = circuitPoint['LatLng'][0];
@@ -85,7 +97,6 @@ class DdetailsState extends State<Details> {
       }).toList();
       print(_formattedPoints);
     } else {
-      // Handle the case where no station is found for the selected subcollection
       print('No station found for $_selectedSubcollection');
     }
   }
@@ -119,6 +130,28 @@ class DdetailsState extends State<Details> {
       appBarVAR = true;
       bottomBarImagesVAR = true;
     });
+  }
+
+  Future<void> _fetchLocationData(Map<String, double>? locationData) async {
+    try {
+      LatLng? location =
+          await Methods.fetchLocationData(_selectedSubcollection!);
+      if (location != null) {
+        print('Location fetched: $location');
+        // Convert LatLng to a Map<String, double>
+        Map<String, double> fetchedData = {
+          'Latitude': location.latitude,
+          'Longitude': location.longitude,
+        };
+        setState(() {
+          _fetchedLocationData = fetchedData;
+        });
+      } else {
+        print('Location data not found');
+      }
+    } catch (e) {
+      debugPrint("Error fetching location data: $e");
+    }
   }
 
   @override
@@ -223,11 +256,12 @@ class DdetailsState extends State<Details> {
                   ),
                   const SizedBox(height: 15),
                   SizedBox(
-                    height: 100, // Set the desired height
+                    height: 100,
+                    width: MediaQuery.of(context).size.width * 0.8,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // First Dropdown
+                        // Dropdown
                         SingleChildScrollView(
                           child: StreamBuilder<DocumentSnapshot>(
                             stream: FirebaseFirestore.instance
@@ -259,7 +293,7 @@ class DdetailsState extends State<Details> {
                                         child: Text(
                                           subcollectionName,
                                           style: const TextStyle(
-                                              color: Colors.blue),
+                                              color: Colors.black45),
                                         ),
                                       ),
                                     );
@@ -274,10 +308,14 @@ class DdetailsState extends State<Details> {
                                       });
                                     },
                                     value: _selectedSubcollection,
-                                    disabledHint: const Text(
-                                      "Select a region first",
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
+                                    style: const TextStyle(
+                                        color: Colors.black45, fontSize: 16.0),
+                                    elevation: 4,
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    iconSize: 24,
+                                    underline: Container(),
+                                    isExpanded: true,
+                                    dropdownColor: Colors.white,
                                   );
                                 } else {
                                   return const Text("No subcollections found");
@@ -288,7 +326,7 @@ class DdetailsState extends State<Details> {
                             },
                           ),
                         ),
-                        // Second Dropdown
+                        // Dropdown
                         SingleChildScrollView(
                           child: StreamBuilder<QuerySnapshot>(
                             stream: _selectedSubcollection != null
@@ -320,7 +358,7 @@ class DdetailsState extends State<Details> {
                                         child: Text(
                                           docSnapshot.id,
                                           style: const TextStyle(
-                                              color: Colors.blue),
+                                              color: Colors.black45),
                                         ),
                                       ),
                                     );
@@ -337,14 +375,20 @@ class DdetailsState extends State<Details> {
                                             _selectedDocument != null) {
                                           _processDataLocal();
                                           _fetchData();
+                                          _fetchLocationData(
+                                              _fetchedLocationData);
                                         }
                                       });
                                     },
                                     value: _selectedDocument,
-                                    disabledHint: const Text(
-                                      "Select a subcollection first",
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
+                                    style: const TextStyle(
+                                        color: Colors.blue, fontSize: 16.0),
+                                    elevation: 4,
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    iconSize: 24,
+                                    underline: Container(),
+                                    isExpanded: true,
+                                    dropdownColor: Colors.white,
                                   );
                                 } else if (snapshot.hasError) {
                                   return Center(
@@ -365,10 +409,12 @@ class DdetailsState extends State<Details> {
                                 ],
                                 onChanged: null,
                                 value: null,
-                                disabledHint: const Text(
-                                  "Select a route first",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 16.0),
+                                elevation: 0,
+                                underline: Container(),
+                                isExpanded: true,
+                                dropdownColor: Colors.white,
                               );
                             },
                           ),
@@ -381,11 +427,11 @@ class DdetailsState extends State<Details> {
                     width: displayWidth,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      borderRadius: const BorderRadius.all(Radius.circular(14)),
                       image: DecorationImage(
-                        image: AssetImage("assets/images/bizerte1.png"),
+                        image: AssetImage(data[widget.index]["image1"]),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -408,27 +454,25 @@ class DdetailsState extends State<Details> {
             child: GestureDetector(
               onTap: () {
                 print("Formatted points before navigation: $_formattedPoints");
-                if (_formattedPoints.isNotEmpty) {
+                if (_formattedPoints.isNotEmpty &&
+                    _fetchedLocationData != null) {
                   print("Navigating to MapScreen");
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => MapScreen(
-                        data: _formattedPoints,
-                        firebasePoint: firebasePoint,
-                      ),
+                          data: _formattedPoints,
+                          firebasePoint: firebasePoint,
+                          fetchedPoint: _fetchedLocationData ?? {},
+                          selectedSubcollection: _selectedSubcollection!),
                     ),
                   ).then((value) {
-                    print(
-                        "Returned from MapScreen"); // Debug statement to check if navigation completes
+                    print("Returned from MapScreen");
                   }).catchError((error) {
-                    print(
-                        "Navigation Error: $error"); // Print any errors that occur during navigation
+                    print("Navigation Error: $error");
                   });
                 } else {
-                  print(
-                      "Formatted points are empty"); // Debug statement to check if _formattedPoints is empty
-                  // Handle case where _formattedPoints is empty
+                  print("Formatted points are empty");
                 }
               },
               child: const Row(
@@ -482,42 +526,50 @@ class DdetailsState extends State<Details> {
           ),
         ),
         const Spacer(),
-        Align(
-          alignment: Alignment.topRight,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: Container(
-                width: 48,
-                height: 48,
-                color: Colors.white,
-                child: const Icon(
-                  Ionicons.download_outline,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.topRight,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: Container(
-                width: 48,
-                height: 48,
-                color: Colors.white,
-                child: const Icon(
-                  FontAwesomeIcons.heart,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ),
-        ),
+        // Align(
+        //   alignment: Alignment.topRight,
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(12),
+        //     child: ClipRRect(
+        //       borderRadius: BorderRadius.circular(32),
+        //       child: Material(
+        //         color: Colors.white, // needed for InkWell to work correctly
+        //         child: InkWell(
+        //           onTap: () {
+        //             _launchMapsUrl(data[widget.index]["city"]);
+        //           },
+        //           child: Container(
+        //             width: 48,
+        //             height: 48,
+        //             alignment: Alignment.center, // center the icon
+        //             child: const Icon(
+        //               Ionicons.download_outline,
+        //               color: Colors.black87,
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // Align(
+        //   alignment: Alignment.topRight,
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(12),
+        //     child: ClipRRect(
+        //       borderRadius: BorderRadius.circular(32),
+        //       child: Container(
+        //         width: 48,
+        //         height: 48,
+        //         color: Colors.white,
+        //         child: const Icon(
+        //           FontAwesomeIcons.heart,
+        //           color: Colors.black87,
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

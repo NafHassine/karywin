@@ -1,5 +1,3 @@
-// constants.dart
-
 const String tEditProfile = 'Edit Profile';
 const String tUserName = 'User Name';
 const String tEmail = 'Email';

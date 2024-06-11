@@ -29,82 +29,69 @@ class ModelItems extends StatelessWidget {
     );
   }
 
-  Widget rating() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(
-              height: 48,
-              color: kSecondaryColor.withOpacity(0.4),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12, right: 16),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      FontAwesomeIcons.solidStar,
-                      color: Color(0xFFFFD600),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        data[index]["rating"],
-                        style: const TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget rating() {
+  //   return Align(
+  //     alignment: Alignment.topLeft,
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(12),
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(32),
+  //         child: BackdropFilter(
+  //           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+  //           child: Container(
+  //             height: 48,
+  //             color: kSecondaryColor.withOpacity(0.4),
+  //             child: Padding(
+  //               padding: const EdgeInsets.only(left: 12, right: 16),
+  //               child: Row(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   const Icon(
+  //                     FontAwesomeIcons.solidStar,
+  //                     color: Color(0xFFFFD600),
+  //                     size: 20,
+  //                   ),
+  //                   const SizedBox(width: 8),
+  //                   Padding(
+  //                     padding: const EdgeInsets.only(top: 2),
+  //                     child: Text(
+  //                       data[index]["rating"],
+  //                       style: const TextStyle(
+  //                         color: kPrimaryColor,
+  //                         fontSize: 16,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Widget favoriteIcon() {
-    return Align(
-      alignment: Alignment.topRight,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: Container(
-            width: 48,
-            height: 48,
-            color: Colors.white,
-            child: const Icon(
-              FontAwesomeIcons.heart,
-              color: Colors.black87,
-            ),
-          ),
-          /*
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(
-              width: 48,
-              height: 48,
-              color: kSecondaryColor.withOpacity(0.4),
-              child: const Icon(
-                FontAwesomeIcons.heart,
-                color: kPrimaryColor,
-              ),
-            ),
-          ), */
-        ),
-      ),
-    );
-  }
+  // Widget favoriteIcon() {
+  //   return Align(
+  //     alignment: Alignment.topRight,
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(12),
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(32),
+  //         child: Container(
+  //           width: 48,
+  //           height: 48,
+  //           color: Colors.white,
+  //           child: const Icon(
+  //             FontAwesomeIcons.heart,
+  //             color: Colors.black87,
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget bottomText() {
     return Align(
@@ -161,9 +148,6 @@ class ModelItems extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             image(),
-            // rating(),
-            // favoriteIcon(),
-            // bottomText(),
           ],
         ),
       ),

@@ -1,9 +1,54 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:kary_win/screens/profile/constants.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:kary_win/screens/profile/componantes.dart';
 
-class UpdateProfileScreen extends StatelessWidget {
+class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
+
+  @override
+  _UpdateProfileScreenState createState() => _UpdateProfileScreenState();
+}
+
+class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
+  late User? _currentUser;
+  Map<String, dynamic>? _userData;
+  String? _imageUrl;
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = FirebaseAuth.instance.currentUser;
+    _getUserData();
+  }
+
+  Future<void> _getUserData() async {
+    if (_currentUser != null) {
+      try {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .get();
+
+        setState(() {
+          _userData = userSnapshot.data() as Map<String, dynamic>?;
+          _imageUrl = userSnapshot['imageUrl'];
+          _usernameController.text = _userData?['username'] ?? 'Loading...';
+          _emailController.text = _userData?['email'] ?? 'Loading...';
+          _phoneController.text = _userData?['phone'] ?? 'Loading...';
+        });
+      } catch (e) {
+        print('Error fetching user data: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,45 +60,31 @@ class UpdateProfileScreen extends StatelessWidget {
           },
           icon: const Icon(LineAwesomeIcons.angle_left),
         ),
-        title: Text(
-          tEditProfile,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
       ),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(tDefaultSize),
           child: Column(
             children: [
-              // -- IMAGE with ICON
-              Stack(
-                children: [
-                  SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: const Image(image: AssetImage('tProfileImage')),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.white,
-                      ),
-                      child: const Icon(
-                        LineAwesomeIcons.camera,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
+              //--Image Holder
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: _imageUrl != null
+                      ? Image.network(
+                          _imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.error);
+                          },
+                        )
+                      : Image.asset(
+                          'assets/images/profile_image.png',
+                          fit: BoxFit.cover,
+                        ),
+                ),
               ),
               const SizedBox(height: 50),
 
@@ -63,6 +94,7 @@ class UpdateProfileScreen extends StatelessWidget {
                   children: [
                     // Username field
                     TextFormField(
+                      controller: _usernameController,
                       decoration: const InputDecoration(
                         labelText: tUserName,
                         prefixIcon: Icon(LineAwesomeIcons.user),
@@ -72,6 +104,7 @@ class UpdateProfileScreen extends StatelessWidget {
 
                     // Email field
                     TextFormField(
+                      controller: _emailController,
                       decoration: const InputDecoration(
                         labelText: tEmail,
                         prefixIcon: Icon(LineAwesomeIcons.envelope_1),
@@ -81,6 +114,7 @@ class UpdateProfileScreen extends StatelessWidget {
 
                     // Phone number field
                     TextFormField(
+                      controller: _phoneController,
                       decoration: const InputDecoration(
                         labelText: tPhoneNo,
                         prefixIcon: Icon(LineAwesomeIcons.phone),
@@ -90,6 +124,7 @@ class UpdateProfileScreen extends StatelessWidget {
 
                     // Password field
                     TextFormField(
+                      controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: tPassword,
@@ -100,16 +135,46 @@ class UpdateProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    TextFormField(
+                      controller: _repeatPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Repeat password",
+                        prefixIcon: const Icon(Icons.fingerprint),
+                        suffixIcon: IconButton(
+                          icon: const Icon(LineAwesomeIcons.eye_slash),
+                          onPressed: () {},
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: tFormHeight),
-
-                    // -- Form Submit Button
                     const SizedBox(
                       height: 20,
                     ),
-
                     // Edit Profile button
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () async {
+                        // Check if email field is not empty and has changed
+                        if (_emailController.text.isNotEmpty) {
+                          await updateEmail(_emailController.text);
+                        }
+                        // Check if password field is not empty and has changed
+                        if (_passwordController.text.isNotEmpty &&
+                            _repeatPasswordController.text.isNotEmpty &&
+                            _passwordController.text ==
+                                _repeatPasswordController.text) {
+                          await updatePassword(_passwordController.text,
+                              _repeatPasswordController.text);
+                        }
+                        // Check if phone field is not empty and has changed
+                        if (_phoneController.text.isNotEmpty) {
+                          await updatePhoneNumber(_phoneController.text);
+                        }
+                        if (_usernameController.text.isNotEmpty) {
+                          await updateUsername(_usernameController.text);
+                        }
+                        Navigator.pop(context, 'updated');
+                      },
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
@@ -132,39 +197,7 @@ class UpdateProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: tFormHeight),
-
-                    // -- Created Date and Delete Button
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     // const Text.rich(
-                    //     //   TextSpan(
-                    //     //     text: tJoined,
-                    //     //     style: TextStyle(fontSize: 12),
-                    //     //     children: [
-                    //     //       TextSpan(
-                    //     //           text: tJoinedAt,
-                    //     //           style: TextStyle(
-                    //     //               fontWeight: FontWeight.bold,
-                    //     //               fontSize: 12))
-                    //     //     ],
-                    //     //   ),
-                    //     // ),
-                    //     ElevatedButton(
-                    //       onPressed: () {},
-                    //       style: ElevatedButton.styleFrom(
-                    //           backgroundColor:
-                    //               Colors.redAccent.withOpacity(0.1),
-                    //           elevation: 0,
-                    //           foregroundColor: Colors.red,
-                    //           shape: const StadiumBorder(),
-                    //           side: BorderSide.none),
-                    //       child: const Text('tDelete'),
-                    //     ),
-                    //   ],
-                    // )
                   ],
                 ),
               ),

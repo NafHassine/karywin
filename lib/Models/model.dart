@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../screens/details.dart';
+import '../screens/user_interface/details.dart';
 import '../data/data.dart';
 import 'model_items.dart';
 
@@ -74,7 +74,6 @@ class _ModelState extends State<Model> {
             width: 200,
             child: Card(
               elevation: 3,
-              // color: Colors.red,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -96,7 +95,6 @@ class _ModelState extends State<Model> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerLeft,
-                      // color: Colors.green,
                       width: double.infinity,
                       margin: const EdgeInsets.only(
                           left: 15, bottom: 10, right: 10),
